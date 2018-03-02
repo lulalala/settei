@@ -1,20 +1,4 @@
-require "settei/version"
-
-module Settei
-  def Base
-    extend Forwardable
-    def_delegator :@config, :dig
-
-    def initialize(yaml)
-      @yaml = yaml
-
-      @config = YAML.load(@yaml)
-
-      begin
-        require "active_support/core_ext/hash/indifferent_access"
-        @config = @config.with_indifferent_access
-      rescue LoadError
-      end
-    end
-  end
-end
+require_relative "settei/version"
+require_relative "settei/serializers/simple_serializer"
+require_relative "settei/accessors/simple_accessor"
+require_relative 'settei/railtie' if !!defined?(Rails)
