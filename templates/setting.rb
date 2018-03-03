@@ -1,11 +1,11 @@
-require 'settei/serializers/simple_serializer'
+require 'settei/loaders/simple_loader'
 require 'settei/accessors/simple_accessor'
 require 'settei/accessors/host_plugin'
 
-serializer = Settei::Serializers::SimpleSerializer.new(
+loader= Settei::Loaders::SimpleLoader.new(
   file_dir_path: "#{File.dirname(__FILE__)}/environments"
 )
 Setting = Settei::Accessors::SimpleAccessor.new(
-  config: serializer.load
+  config: loader.to_hash
 )
 Setting.extend Settei::Accessor::HostPlugin
