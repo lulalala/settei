@@ -2,6 +2,10 @@ require 'settei/generators/rails'
 require 'rails/generators/rails/app/app_generator'
 
 RSpec.describe Settei::Generators::Rails do
+  let(:template_path) { File.join(File.dirname(__FILE__), '..', '..', 'templates') }
+  let(:setting_rb_content) { File.read(File.join(template_path, 'setting.rb')) }
+  let(:setting_yml_content) { File.read(File.join(template_path, 'setting.yml')) }
+
   it 'generates files' do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do
@@ -18,11 +22,11 @@ RSpec.describe Settei::Generators::Rails do
         subject = described_class.new(app_path: app_path)
         subject.run
 
-        expect(File.read(File.join(app_path, 'config/setting.rb'))).to include("require 'settei'")
+        expect(File.read(File.join(app_path, 'config/setting.rb'))).to eq(setting_rb_content)
 
-        expect(File.exist?(File.join(app_path, 'config/environments/development.yml'))).to eq(true)
-        expect(File.exist?(File.join(app_path, 'config/environments/test.yml'))).to eq(true)
-        expect(File.exist?(File.join(app_path, 'config/environments/production.yml'))).to eq(true)
+        expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq(setting_yml_content)
+        expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq(setting_yml_content)
+        expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq(setting_yml_content)
 
         expect(File.read(File.join(app_path, 'config/boot.rb'))).to include("require_relative 'setting'")
         expect(File.read(File.join(app_path, '.gitignore'))).to include("config/environments/*.yml")
@@ -35,23 +39,24 @@ RSpec.describe Settei::Generators::Rails do
       Dir.chdir(dir) do
         Rails::Generators::AppGenerator.start ['foo', '--skip-bundle']
 
-        app_path = File.join(dir, 'foo')
+        existing_content = 'bar'
+        app_path = File.join(dir, existing_content)
 
-        File.open(File.join(app_path, 'config/setting.rb'), 'w+')  {|f|f.write("foo") }
-        File.open(File.join(app_path, 'config/environments/development.yml'), 'w+')  {|f|f.write("foo") }
-        File.open(File.join(app_path, 'config/environments/test.yml'), 'w+')  {|f|f.write("foo") }
-        File.open(File.join(app_path, 'config/environments/production.yml'), 'w+')  {|f|f.write("foo") }
-        File.open(File.join(app_path, '.gitignore'), 'w+')  {|f|f.write("foo") }
+        File.write(File.join(app_path, 'config/setting.rb'), existing_content)
+        File.write(File.join(app_path, 'config/environments/development.yml'), existing_content)
+        File.write(File.join(app_path, 'config/environments/test.yml'), existing_content)
+        File.write(File.join(app_path, 'config/environments/production.yml'), existing_content)
+        File.write(File.join(app_path, '.gitignore'), existing_content)
 
         subject = described_class.new(app_path: app_path)
         subject.run
         subject.run
 
-        expect(File.read(File.join(app_path, 'config/setting.rb'))).to eq('foo')
-
-        expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq('foo')
-        expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq('foo')
-        expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq('foo')
+        # Ensure not changed
+        expect(File.read(File.join(app_path, 'config/setting.rb'))).to eq(existing_content)
+        expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq(existing_content)
+        expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq(existing_content)
+        expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq(existing_content)
 
         boot_content = File.read(File.join(app_path, 'config/boot.rb'))
         expect(boot_content.scan("require_relative 'setting'").length).to eq(1)
