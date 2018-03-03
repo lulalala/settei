@@ -11,6 +11,7 @@ module Settei
       def run
         create_setting_rb
         create_ymls
+        update_boot_rb
         update_gitignore
       end
 
@@ -40,11 +41,23 @@ module Settei
         end
       end
 
+      def update_boot_rb
+        file_name = 'config/boot.rb'
+        file_path = File.join(@app_path, file_name)
+        text = "\nrequire_relative 'setting'"
+
+        append(file_name, file_path, text)
+      end
+
       def update_gitignore
         file_name = '.gitignore'
         file_path = File.join(@app_path, file_name)
         text = "\n/config/environments/*.yml"
 
+        append(file_name, file_path, text)
+      end
+
+      def append(file_name, file_path, text)
         file_content = File.read(file_path)
         if !file_content.include?(text)
           File.open(file_path, 'a+') { |file| file.write(text) }

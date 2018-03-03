@@ -24,6 +24,7 @@ RSpec.describe Settei::Generators::Rails do
         expect(File.exist?(File.join(app_path, 'config/environments/test.yml'))).to eq(true)
         expect(File.exist?(File.join(app_path, 'config/environments/production.yml'))).to eq(true)
 
+        expect(File.read(File.join(app_path, 'config/boot.rb'))).to include("require_relative 'setting'")
         expect(File.read(File.join(app_path, '.gitignore'))).to include("config/environments/*.yml")
       end
     end
@@ -51,6 +52,9 @@ RSpec.describe Settei::Generators::Rails do
         expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq('foo')
         expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq('foo')
         expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq('foo')
+
+        boot_content = File.read(File.join(app_path, 'config/boot.rb'))
+        expect(boot_content.scan("require_relative 'setting'").length).to eq(1)
 
         gitignore_content = File.read(File.join(app_path, '.gitignore'))
         expect(gitignore_content.scan("/config/environments/*.yml").length).to eq(1)
