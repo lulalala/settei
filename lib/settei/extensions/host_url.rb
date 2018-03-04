@@ -1,7 +1,7 @@
 module Settei
-  module Accessors
+  module Extensions
     # For computing the a string for host settings. There can be multiple host settings such as asset host.
-    module HostPlugin
+    module HostUrl
       # @params [String, Symbol] server name of host
       # @params [Hash] params segment key-values to override default. A false value can hide that segment.
       # @option params [String, false] :protocol
