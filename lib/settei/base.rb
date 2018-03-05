@@ -1,3 +1,5 @@
+require 'forwardable'
+
 # Accessor for configuration values in a hash.
 module Settei
   class Base

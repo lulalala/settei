@@ -1,5 +1,6 @@
 require 'settei/generators/rails'
 require 'rails/generators/rails/app/app_generator'
+require 'tmpdir'
 
 RSpec.describe Settei::Generators::Rails do
   let(:template_path) { File.join(File.dirname(__FILE__), '..', '..', 'templates') }
