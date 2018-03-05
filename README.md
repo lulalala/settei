@@ -43,14 +43,15 @@ For 12-factor deployment, pass config via environment variable like this:
 For mina:
 
 ```ruby
-task :env do
+set :bundle_prefix, -> {
   require 'settei/loaders/simple_loader'
-  value = Settei::Loaders::SimpleLoader.new(
+  loader = Settei::Loaders::SimpleLoader.new(
     file_dir_path: File.join(File.dirname(__FILE__), "environments"),
     environment: fetch(:rails_env)
   )
-  queue %[APP_CONFIG="#{value}"]
-end
+
+  %{APP_CONFIG="#{loader.to_env_var}" RAILS_ENV="#{fetch(:rails_env)}" #{fetch(:bundle_bin)} exec}
+}
 ```
 
 For capistrano:
