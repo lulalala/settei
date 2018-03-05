@@ -11,6 +11,20 @@ RSpec.describe Settei::Base do
     )
   }
 
+  describe '#initialize' do
+    it 'initializes when hash is supplied' do
+      expect {
+        described_class.new({a:1})
+      }.not_to raise_error
+    end
+
+    it 'raises error if config is not a hash' do
+      expect {
+        described_class.new(1)
+      }.to raise_error(ArgumentError)
+    end
+  end
+
   describe '#dig' do
     it 'returns dig value as is for the inner hash' do
       result = subject.dig(:foo, :bar)

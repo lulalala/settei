@@ -8,6 +8,10 @@ module Settei
 
     # @params config [Hash] configuration
     def initialize(config)
+      if !config.is_a? Hash
+        raise ArgumentError.new('config is not a hash')
+      end
+
       self.config = config
     end
 
