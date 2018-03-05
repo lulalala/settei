@@ -41,7 +41,7 @@ RSpec.describe Settei::Generators::Rails do
         Rails::Generators::AppGenerator.start ['foo', '--skip-bundle']
 
         existing_content = 'bar'
-        app_path = File.join(dir, existing_content)
+        app_path = File.join(dir, 'foo')
 
         File.write(File.join(app_path, 'config/setting.rb'), existing_content)
         File.write(File.join(app_path, 'config/environments/development.yml'), existing_content)
