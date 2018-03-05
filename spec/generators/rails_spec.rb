@@ -15,8 +15,7 @@ RSpec.describe Settei::Generators::Rails do
         app_path = File.join(dir, 'foo')
 
         expect(File.exist?(File.join(app_path, 'config/setting.rb'))).to eq(false)
-        expect(File.exist?(File.join(app_path, 'config/environments/development.yml'))).to eq(false)
-        expect(File.exist?(File.join(app_path, 'config/environments/test.yml'))).to eq(false)
+        expect(File.exist?(File.join(app_path, 'config/environments/default.yml'))).to eq(false)
         expect(File.exist?(File.join(app_path, 'config/environments/production.yml'))).to eq(false)
         expect(File.read(File.join(app_path, '.gitignore'))).to_not include("config/environments/*.yml")
 
@@ -25,8 +24,7 @@ RSpec.describe Settei::Generators::Rails do
 
         expect(File.read(File.join(app_path, 'config/setting.rb'))).to eq(setting_rb_content)
 
-        expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq(setting_yml_content)
-        expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq(setting_yml_content)
+        expect(File.read(File.join(app_path, 'config/environments/default.yml'))).to eq(setting_yml_content)
         expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq(setting_yml_content)
 
         expect(File.read(File.join(app_path, 'config/boot.rb'))).to include("require_relative 'setting'")
@@ -44,8 +42,7 @@ RSpec.describe Settei::Generators::Rails do
         app_path = File.join(dir, 'foo')
 
         File.write(File.join(app_path, 'config/setting.rb'), existing_content)
-        File.write(File.join(app_path, 'config/environments/development.yml'), existing_content)
-        File.write(File.join(app_path, 'config/environments/test.yml'), existing_content)
+        File.write(File.join(app_path, 'config/environments/default.yml'), existing_content)
         File.write(File.join(app_path, 'config/environments/production.yml'), existing_content)
         File.write(File.join(app_path, '.gitignore'), existing_content)
 
@@ -55,8 +52,7 @@ RSpec.describe Settei::Generators::Rails do
 
         # Ensure not changed
         expect(File.read(File.join(app_path, 'config/setting.rb'))).to eq(existing_content)
-        expect(File.read(File.join(app_path, 'config/environments/development.yml'))).to eq(existing_content)
-        expect(File.read(File.join(app_path, 'config/environments/test.yml'))).to eq(existing_content)
+        expect(File.read(File.join(app_path, 'config/environments/default.yml'))).to eq(existing_content)
         expect(File.read(File.join(app_path, 'config/environments/production.yml'))).to eq(existing_content)
 
         boot_content = File.read(File.join(app_path, 'config/boot.rb'))

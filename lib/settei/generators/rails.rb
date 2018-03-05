@@ -29,7 +29,7 @@ module Settei
       end
 
       def create_ymls
-        [:development, :test, :production].each do |env|
+        [:production, :default].each do |env|
           file_name = "config/environments/#{env}.yml"
 
           create_if_absent(file_name) do |file_name|
