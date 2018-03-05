@@ -38,34 +38,9 @@ Setting.dig(:google, :api, :secret)
 
 ## Deployment
 
-For 12-factor deployment, pass config via environment variable like this:
+If `deploy.rb` is present, `rake settei:rails:install` would append code to it, so serialized config is passed as an environment variable, compliant to 12-factor deployment.
 
-For mina:
-
-```ruby
-require 'settei/loaders/simple_loader'
-loader = Settei::Loaders::SimpleLoader.new(
-  dir: File.join(File.dirname(__FILE__), "environments")
-)
-loader.load(fetch(:rails_env))
-
-set :bundle_prefix, -> {
-  %{#{loader.as_env_assignment} RAILS_ENV="#{fetch(:rails_env)}" #{fetch(:bundle_bin)} exec}
-}
-```
-
-For capistrano:
-
-```ruby
-require 'settei/loaders/simple_loader'
-loader = Settei::Loaders::SimpleLoader.new(
-  dir: File.join(File.dirname(__FILE__), "environments")
-)
-loader.load(fetch(:rails_env))
-
-set :default_env, {loader.env_name => loader.as_env_value}
-```
-
+For other web frameworks, imitate what's being appended in `templates/_capistrano.rb` or `templates/_mina.rb`. It's really simple code.
 
 ## Accessor and Loader
 

@@ -13,6 +13,7 @@ module Settei
         create_ymls
         update_boot_rb
         update_gitignore
+        update_deploy_rb
       end
 
       private
@@ -53,6 +54,28 @@ module Settei
         file_name = '.gitignore'
         file_path = File.join(@app_path, file_name)
         text = "\n/config/environments/*.yml"
+
+        append(file_name, file_path, text)
+      end
+
+      def update_deploy_rb
+        file_name = 'config/deploy.rb'
+        file_path = File.join(@app_path, file_name)
+
+        return if !File.exist?(file_path)
+
+        file_content = File.read(file_path)
+        return if file_content.include?('Settei::')
+
+        if defined?(Mina)
+          text = File.read(File.join(@gem_path, 'templates/_mina.rb'))
+        elsif defined?(Capistrano)
+          text = File.read(File.join(@gem_path, 'templates/_capistrano.rb'))
+        else
+          return
+        end
+
+        text.prepend("\n\n# Settei: append serialized config as an environment variable\n")
 
         append(file_name, file_path, text)
       end

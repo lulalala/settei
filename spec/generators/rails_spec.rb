@@ -46,6 +46,10 @@ RSpec.describe Settei::Generators::Rails do
         File.write(File.join(app_path, 'config/environments/production.yml'), existing_content)
         File.write(File.join(app_path, '.gitignore'), existing_content)
 
+        # Pretend mina exists
+        File.write(File.join(app_path, 'config/deploy.rb'), existing_content)
+        stub_const 'Mina', :class
+
         subject = described_class.new(app_path: app_path)
         subject.run
         subject.run
@@ -60,6 +64,9 @@ RSpec.describe Settei::Generators::Rails do
 
         gitignore_content = File.read(File.join(app_path, '.gitignore'))
         expect(gitignore_content.scan("/config/environments/*.yml").length).to eq(1)
+
+        mina_content = File.read(File.join(app_path, 'config/deploy.rb'))
+        expect(mina_content.scan("# Settei:").length).to eq(1)
       end
     end
   end
