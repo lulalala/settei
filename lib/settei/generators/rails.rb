@@ -84,7 +84,7 @@ module Settei
         file_content = File.read(file_path)
         if !file_content.include?(text)
           File.open(file_path, 'a+') { |file| file.write(text) }
-          puts "Appended rule to #{file_name}."
+          puts "Appended: #{file_name}."
         end
       end
 
