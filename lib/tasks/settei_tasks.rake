@@ -2,9 +2,9 @@ require 'rake'
 require 'settei/generators/rails'
 
 namespace :settei do
-  namespace :rails do
+  namespace :install do
     desc "Setup settei for Rails project"
-    task :install do
+    task :rails do
       Settei::Generators::Rails.new(app_path: Dir.pwd).run
     end
   end

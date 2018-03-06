@@ -22,8 +22,8 @@ Or install it yourself as:
 
 For Rails, a rake task is available for simple setup:
 
-```ruby
-rake settei:rails:install
+```shell
+rake settei:install:rails
 ```
 
 A `config/setting.rb` file is added for basic setup.
@@ -38,7 +38,7 @@ Setting.dig(:google, :api, :secret)
 
 ## Deployment
 
-If `deploy.rb` is present, `rake settei:rails:install` would append code to it, so serialized config is passed as an environment variable, compliant to 12-factor deployment.
+If `deploy.rb` is present, `rake settei:install:rails` would append code to it, so serialized config is passed as an environment variable, compliant to 12-factor deployment.
 
 For other web frameworks, imitate what's being appended in `templates/_capistrano.rb` or `templates/_mina.rb`. It's really simple code.
 
