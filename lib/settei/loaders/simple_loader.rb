@@ -4,18 +4,22 @@ require 'zlib'
 
 module Settei
   module Loaders
+    # Loader designed to load hash from environment variable and YAML files.
+    # After initialization, call {#load} to load hash into memory,
+    # then call {#as_hash}, {#as_env_value}, or {#as_env_assignment} to obtain the results.
+    # e.g. `loader.load(:production).as_hash`
     class SimpleLoader
       attr_reader :env_name
 
-      # @params dir [String] path of directory containing config YAML files
-      # @params env_name [String] key for environment variable
+      # @param dir [String] path of directory containing config YAML files
+      # @param env_name [String] name for environment variable
       def initialize(dir: nil, env_name: 'APP_CONFIG')
         @dir = dir
         @env_name = env_name
       end
 
       # Loads yaml file into memory.
-      # If ENV[@env_name] exists, loader loads from it,
+      # If `ENV[@env_name]` exists, loader loads from it,
       # otherwise load from YAML file.
       #
       # YAML file is picked based on provided `environment`.
@@ -23,7 +27,7 @@ module Settei
       # or specified environment file does not exist,
       # default.yml is loaded.
       #
-      # @params environment [String] application environment (e.g. production/test)
+      # @param environment [String] application environment (e.g. production/test)
       # @return [self] for further chaining
       def load(environment = nil)
         if !ENV[@env_name].nil?
@@ -61,7 +65,8 @@ module Settei
         )
       end
 
-      # @return [String] #to_env_value with assignment to `env_name`
+      # Convenience method for outputting "NAME=VALUE" in one call.
+      # @return [String] {#as_env_value} with assignment to `env_name`
       def as_env_assignment
         ensure_loaded!
 

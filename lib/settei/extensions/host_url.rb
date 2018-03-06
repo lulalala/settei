@@ -2,13 +2,13 @@ module Settei
   module Extensions
     # For computing the a string for host settings. There can be multiple host settings such as asset host.
     module HostUrl
-      # @params [String, Symbol] server name of host
-      # @params [Hash] params segment key-values to override default. A false value can hide that segment.
+      # @param [String, Symbol] server name of host
+      # @param [Hash] params segment key-values to override default. A false value can hide that segment.
       # @option params [String, false] :protocol
       # @option params [String, false] :subdomain
       # @option params [String, false] :domain
       # @option params [Integer, false] :port
-      # @returns [String] host domain
+      # @return [String] host domain
       def host(server = :default, params = {})
         default_params = dig(:hosts, server)
         params = default_params.merge(params)

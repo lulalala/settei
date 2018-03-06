@@ -1,6 +1,13 @@
 # Settei
 
-Hash based configuration with flexibility and 12-factor deployment in mind
+Hash based configuration with flexibility and 12-factor app deployment in mind
+
+## Design Philosophies
+
+* Fast as it is accessible without loading Rails
+* Ease of management as nested hash is allowed
+* 12-factor compatible by serializing as environment variable.
+* Minimal meta-programming magics, so you can add your flavor of magic.
 
 ## Installation
 
@@ -22,9 +29,7 @@ Or install it yourself as:
 
 For Rails, a rake task is available for simple setup:
 
-```shell
-rake settei:install:rails
-```
+    $ settei:install:rails
 
 A `config/setting.rb` file is added for basic setup.
  
@@ -53,39 +58,40 @@ Install script maps `Setting` to an instance of `Settei::Base`, for convenience.
 ```ruby
 loader = Settei::Loaders::SimpleLoader.new(dir: 'path/to/dir')
 loader.load.as_hash # loads default.yml and returns a hash
-loader.load(:production).as_env_value # loads production.yml and returns XYZ
-loader.load(:test).as_env_assignment # loads test.yml and returns APP_CONG=XYZ
+loader.load(:production).as_env_value # loads production.yml and returns "XYZ"
+loader.load(:test).as_env_assignment # loads test.yml and returns "APP_CONG=XYZ"
 ```
 
-We welcome PR for different types of loaders, as `SimpleLoader` is not suitable for every situation.
+We welcome PRs for different types of loaders, as `SimpleLoader` is not suitable for every situation.
 
 ## Deployment
 
-If `deploy.rb` is present, `rake settei:install:rails` would append code to it, so serialized config is passed as an environment variable, compliant to 12-factor deployment.
+If `deploy.rb` is present, `rake settei:install:rails` will append code to it, allow serialized config to be passed as an environment variable.
 
-## Sinatra, Hanami
+## Frameworks other than Rails
 
-Settei is really simple so it won't take much time to integrate into other frameworks, the steps are mainly:
+Settei is designed to be simple so you can integrate it into any frameworks easily. The steps are mainly:
 
 1. Designate a folder for storing YAML files.
 2. Create a `setting.rb` file, in which `Settei::Base` is initialized (see `templates/setting.rb`)
 3. Require it when framework starts.
 4. Load and pass serialized production config as environment variable in deploy script (see `templates/_capistrano.rb` or `templates/_mina.rb`).
 
-## Design Philosophies
+We also welcome PRs for generators of other frameworks too.
 
-### Accessible outside of application
+# Ruby < 2.3
 
-Setting should be accessible by itself, because for application like Rails, the boot time is too slow.
+`Settei::Base` uses `dig` to access the configuration, available since Ruby 2.3. If your Ruby is not new enough, don't be afraid. Write your own hash accessor literally takes minutes. You can even use `SettingsLogic.new(hash)` .
 
-### Manage settings using a hash
+# FAQ
 
-Using hash to manage settings makes life easier. For one thing it can be nested, acting as a namespace. A hash of setting can also be fetched and used a method call arugments, reducing lines of code.
+**Q:** Would serialized configuration be too big for environment variable?  
+**A:** [The upper limit is pretty big.](https://stackoverflow.com/a/1078125/474597)
 
-### Compliant with 12-factor manifesto
 
-Settings can be passed on to deploy server as environment variable.
+## TODO
 
-### PORO
+* Integrate Rails configurations (e.g. database) into Settei.
+* Explore deep merge hash so development.yml can combine with default.yml.
+* Make loader configurable so it is easy to add and mix functionality.
 
-Minimal meta-programming magics are used, so you can add your flavor of magic without causing conflicts.
