@@ -11,7 +11,7 @@ module Settei
       def run
         create_setting_rb
         create_ymls
-        update_boot_rb
+        update_application_rb
         update_gitignore
         update_deploy_rb
       end
@@ -42,12 +42,15 @@ module Settei
         end
       end
 
-      def update_boot_rb
-        file_name = 'config/boot.rb'
+      def update_application_rb
+        file_name = 'config/application.rb'
         file_path = File.join(@app_path, file_name)
-        text = "\nrequire_relative 'setting'"
+        text = "require_relative 'setting'"
 
-        append(file_name, file_path, text)
+        file_content = File.read(file_path)
+        return if file_content.include?(text)
+
+        gsub_file(file_name, file_path, "require 'rails/all'", "require 'rails/all'\n\n#{text}")
       end
 
       def update_gitignore
@@ -95,6 +98,15 @@ module Settei
           yield file_name
           puts "Created: #{file_name}"
         end
+      end
+
+      # Copied and modified from thor
+      def gsub_file(file_name, file_path, flag, *args, &block)
+        content = File.read(file_path)
+        content.gsub!(flag, *args, &block)
+        File.open(file_path, "wb") { |file| file.write(content) }
+
+        puts "Inserted: #{file_name}."
       end
     end
   end
