@@ -28,7 +28,7 @@ rake settei:install:rails
 
 A `config/setting.rb` file is added for basic setup.
  
-Three YAML files are added for each environment (e.g. `config/environments/development.yml`). You should add settings inside those. They are ignored by git.
+YAML files are added under `config/environments` and is ignored by git.
 
 In your app, you can access the settings like this:
 
@@ -36,17 +36,41 @@ In your app, you can access the settings like this:
 Setting.dig(:google, :api, :secret)
 ```
 
+## Settei::Base
+
+`Settei::Base` is the core class for accessing the configurations. It is initialized by a hash. It is a light wrapper intended for you to extend.
+
+`#dig` is used to access its values. It's convenient because it does not err if nested hash is absent.
+
+`#dig_and_wrap` will return a `Settei::Base` if it the return value is a hash.
+
+Install script maps `Setting` to an instance of `Settei::Base`, for convenience.
+
+## Loader
+
+`Settei::Loaders::SimpleLoader` is responsible for providing the hash to initialize `Settei::Base`. It loads from a source such as YAML or environment variable. It can also serialize the whole hash into one string, suitable for deploying via environment variables.
+
+```ruby
+loader = Settei::Loaders::SimpleLoader.new(dir: 'path/to/dir')
+loader.load.as_hash # loads default.yml and returns a hash
+loader.load(:production).as_env_value # loads production.yml and returns XYZ
+loader.load(:test).as_env_assignment # loads test.yml and returns APP_CONG=XYZ
+```
+
+We welcome PR for different types of loaders, as `SimpleLoader` is not suitable for every situation.
+
 ## Deployment
 
 If `deploy.rb` is present, `rake settei:install:rails` would append code to it, so serialized config is passed as an environment variable, compliant to 12-factor deployment.
 
-For other web frameworks, imitate what's being appended in `templates/_capistrano.rb` or `templates/_mina.rb`. It's really simple code.
+## Sinatra, Hanami
 
-## Accessor and Loader
+Settei is really simple so it won't take much time to integrate into other frameworks, the steps are mainly:
 
-**Accessor** is the class that reads your hash configuration. You can then add convenience methods into it.
-
-**Loader** loads a hash from sources (e.g. YAML or environment variable), which can then be passed to accessor. It can also serialize the whole hash into one string, suitable for environment variables.
+1. Designate a folder for storing YAML files.
+2. Create a `setting.rb` file, in which `Settei::Base` is initialized (see `templates/setting.rb`)
+3. Require it when framework starts.
+4. Load and pass serialized production config as environment variable in deploy script (see `templates/_capistrano.rb` or `templates/_mina.rb`).
 
 ## Design Philosophies
 
