@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["lulalala"]
   spec.email         = ["mark@goodlife.tw"]
 
-  spec.summary       = %q{Ruby configuration}
-  #spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.summary       = %q{Hash based configuration}
+  spec.description   = %q{Hash based configuration with flexibility and 12-factor app deployment in mind. Settei allows use of nested hash, and can be serialized as environment variable, suitable for 12-factor app.}
   spec.homepage      = "https://github.com/lulalala/settei"
   spec.licenses      = ['MIT']
 
