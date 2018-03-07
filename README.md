@@ -1,13 +1,18 @@
 # Settei
 
-Hash based configuration with flexibility and 12-factor app deployment in mind
+Config as YAML file yet still being 12-factor compliant...
 
-## Design Philosophies
+...by serializing the file as one environment variable.
 
-* Fast as it is accessible without loading Rails
-* Ease of management as nested hash is allowed
-* 12-factor compliant by serializing as environment variable.
-* Minimal meta-programming magics, so you can add your flavor of magic.
+![Settei Illustrated](misc/illustrated.png?raw=true "Settei Illustrated")
+
+## Features
+
+* Can be read without loading Rails
+* Variable namespacing using nested hash
+* Follows 12-factor [rule 3](https://12factor.net/config) - store config in the environment
+* Customizable due to loosely coupled PORO parts
+
 
 ## Installation
 
@@ -28,10 +33,10 @@ For Rails, execute this rake task for out-of-the-box setup:
 This task does the following things:
 
 * create `config/setting.rb` for setting up `Setting`.
-* load above in `config/application.rb`
+* require the above in `config/application.rb`
 * create YAML files `config/environments/default.yml` and `config/environments/production.yml`
 * make git ignore YAML files above
-* append script to `deploy.rb` so config is pass via environement variable to production
+* append script to `deploy.rb` so config is passed via env var to production
 
 ## Usage
 
@@ -58,15 +63,16 @@ For other available methods, [check here](http://www.rubydoc.info/github/lulalal
 
 If you have `development.yml` or `test.yml`, it will be loaded instead of `default.yml`.
 
+### Deploy
+
+The `deploy.rb` is modified so deploy process will serialize `production.yml` into one long string, and pass it to remote server as **a single environment variable**. There it is de-serialized and loaded, and the rest works the same way.
+
 ## Why
 
-Rails `secrets.yml` and `credentials.yml.enc` are messy and complex. I already forgot which to version control and which not to.
+Most config gems have not been updated for ages, and do not meet my needs:
 
-Not to mention all the major config gems have not been updated for ages.
+I want to be 12-factor compliant, but I also hate using environment variables. See the following example: naming is hard and names tend to be very long. Passing more env vars also becomes more impractical.
 
-I want to be 12-factor app compliant, deploy with ease without copy config file to production server. However I hate using environment variables: naming is hard and names tend to be very long. Instead I like nestable hash in `SettingsLogic`.
-
-Compare the following. The old ENV way of manage settings is clunky, and passing more than 5 env vars is also impractical.
 ```
 BOARD_PAGINATION_PER_PAGE=5
 BOARD_PAGINATION_MAX_PAGE=10
@@ -74,7 +80,7 @@ BOARD_REPLY_OMIT_CONDITION_N_RECENT_ONLY=5
 BOARD_REPLY_OMIT_CONDITION_AVOID_ONLY_N_HIDDEN=2
 ```
 
-In comparison YAML and nested hash is easy. You know why I write SASS instead of CSS.
+In comparison YAML allows nested hash, so we can manage them using namespaces.
 
 ```yaml
 board:
@@ -92,21 +98,42 @@ Yes, if settings are stored in YAML files, but during deploy, transfer the whole
 
 I feel it is simpler and more effective.
 
+## Tips
+
+Rails `secrets.yml` and `credentials.yml.enc` are needlessly complex, and now we are able to ignore them:
+
+Do away with Rails 4.1 secret.yml with something like this:
+```ruby
+# secret_token.rb
+Foo::Application.config.secret_token = Setting.dig(:rails, :secret_token)
+Foo::Application.config.secret_key_base = Setting.dig(:rails, :secret_key_base)
+```
+
+Similarly with Rails 5.2's credentials:
+
+```ruby
+# application.rb
+config.secret_token = Setting.dig(:rails, :secret_token) 
+config.secret_key_base = Setting.dig(:rails, :secret_key_base) 
+```
+
+Maybe we can get rid of `database.yml` one day too.
+
 ## Customization
 
-Settei is design to be customizable. One can start by editing the generated `setting.rb` file. The three parts involved are:
+The default setup is probably good enough for 90% of the users. However if you have advance requirements, you can easily customize.
 
-### Settei::Base 
+One can start by editing the generated `setting.rb` file. The three parts are `Settei::Base`, loader and deploy script:
 
-`Setting` is an instance of `Settei::Base`, the core class for accessing the configurations. It is initialized by a hash. It is a light wrapper intended for you to extend to.
+### Settei::Base
+
+`Setting` is an instance of `Settei::Base`, the accessor of the configurations. It is initialized by a hash.
 
 You can change `Setting` to other constants or a global variable.
 
-You can also replace `Settei::Base` with your own accessor class, or you can just use the hash as is.
+You can also extend or replace `Settei::Base` with your own class, or you can just use the hash without any wrapper.
 
-#### Ruby < 2.3
-
-`Settei::Base` uses `dig` to access the configuration, available since Ruby 2.3. If your Ruby is not new enough, why not write your own hash wrapper. You can even use `SettingsLogic.new(hash)` 
+**Note** For Ruby < 2.3, `Hash#dig` is not available. What you can do is to replace `Settei::Base` with your own class, or even use `SettingsLogic.new(hash)`.
 
 ### Loader
 
@@ -123,13 +150,11 @@ When initializing it, you can set:
 loader = Settei::Loaders::SimpleLoader.new(dir: 'path/to/dir')
 ```
 
-To load data, call `load(Rails.env)`. The passed parameter will try to load `development.yml` if it exists, else it loads `default.yml`.
+To load data, call `load(Rails.env)`. In development environment, it tries to load `development.yml` if it exists, else it loads `default.yml`.
 
 Once data is loaded, we can obtain it in hash form by calling `as_hash`
 
-The deploy script also rely on its ability to serialize the whole hash into one string, suitable for deploying as an environment variable. The methods `as_env_assignment` and `as_env_value` are provided for this.
-
-Here are sample calls:
+The deploy script also relies on loader's ability to serialize the whole hash into one string, suitable for deploying as environment variable. The methods `as_env_assignment` and `as_env_value` are provided for this purpose, e.g.:
 
 ```ruby
 loader.load.as_hash # loads default.yml and returns a hash
@@ -141,9 +166,9 @@ But no one is stopping you from writing your own loader. For example you might w
 
 For more detailed doc of `SimpleLoader`, [check here](http://www.rubydoc.info/github/lulalala/settei/master/Settei/Loaders/SimpleLoader).
 
-### Deploy
+### Deploy script
 
-If you don't care about 12-factor app, you can roll your own solution to just copy the yml file to production ¯\_(ツ)_/¯.
+If you have more complex deploy requirements, just edit/revert the changes on `deploy.rb`.
 
 ### Frameworks other than Rails
 
@@ -152,42 +177,22 @@ Settei is designed to be simple so you can integrate it into any frameworks easi
 1. Designate a folder for storing YAML files.
 2. Create a `setting.rb` file, in which `Settei::Base` is initialized (see `templates/setting.rb`)
 3. Require it when framework starts.
-4. Load and pass serialized production config as environment variable in deploy script (see `templates/_capistrano.rb` or `templates/_mina.rb`).
+4. Load production.yml, pass its serialized form as environment variable to production (see `templates/_capistrano.rb` or `templates/_mina.rb`).
 
 ## FAQ
 
 **Q:** Would serialized configuration be too big for environment variable?  
 **A:** [The upper limit is pretty big.](https://stackoverflow.com/a/1078125/474597)
 
-## Tips
-
-Do away with Rails' secret.yml with something like this:
-```ruby
-# secret_token.rb
-Foo::Application.config.secret_token = Setting.dig(:rails, :secret_token)
-Foo::Application.config.secret_key_base = Setting.dig(:rails, :secret_key_base)
-```
-
-Similarly with Rails 5.2's credentials:
-
-```ruby
-# application.rb
-config.secret_token = Setting.dig(:rails, :secret_token) 
-config.secret_key_base = Setting.dig(:rails, :secret_key_base) 
-```
-
-## TODO
-
-* Integrate Rails configurations (e.g. database) into Settei.
-* Explore deep merge hash so development.yml can combine with default.yml.
-* Make loader configurable so it is easy to add and mix functionality.
-* Rake task for heroku setup
-
 ## Contribution
 
-Some PR ideas are:
+The slogan "YAML config yet still 12-factor compliant" is not entirely correct. Why not load from TOML or .env? If there is a need we can accommodate for that.
+
+PRs are welcomed. Some ideas are:
 
 * generators for other frameworks
-* loader or its plugin
+* loader or its plugins
 * plugin for `Settei::Base`
-
+* explore deep merge hash so development.yml can combine with default.yml.
+* make loader configurable so it is easy to add and mix functionality.
+* rake task for heroku setup
