@@ -65,7 +65,9 @@ If you have `development.yml` or `test.yml`, it will be loaded instead of `defau
 
 ### Deploy
 
-The `deploy.rb` is modified so deploy process will serialize `production.yml` into one long string, and pass it to remote server as **a single environment variable**. There it is de-serialized and loaded, and the rest works the same way.
+If you use Capistrano or Mina, the `deploy.rb` is modified so deploy process will serialize `production.yml` into one long string, and pass it to remote server as **a single environment variable**. There it is de-serialized and loaded, and the rest works the same way.
+
+If you use Heroku, use `rake settei:heroku:config:set app=[app_name]` to upload your config. You need heroku-cli and authenticate first.
 
 ## Why
 
