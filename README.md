@@ -16,10 +16,11 @@ Config as YAML file yet still being 12-factor compliant...
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Insert into Gemfile:
 
 ```ruby
 gem 'settei'
+# gem 'dig_rb' # for Ruby < 2.3
 ```
 
 And then execute:
@@ -133,9 +134,7 @@ One can start by editing the generated `setting.rb` file. The three parts are `S
 
 You can change `Setting` to other constants or a global variable.
 
-You can also extend or replace `Settei::Base` with your own class, or you can just use the hash without any wrapper.
-
-**Note** For Ruby < 2.3, `Hash#dig` is not available. What you can do is to replace `Settei::Base` with your own class, or even use `SettingsLogic.new(hash)`.
+You can also extend `Settei::Base`, or replace it with other classes such as `SettingsLogic.new(hash)`, or you can just use the hash without it.
 
 ### Loader
 
