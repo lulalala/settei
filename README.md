@@ -58,7 +58,7 @@ Setting.dig(:google, :api)
 
 `#dig` is used to access its values. It's convenient because it does not err if nested hash is absent.
 
-`#dig_and_wrap` will return a `Settei::Base` if it the return value is a hash.
+`#dig_and_wrap` will return a `Settei::Base` if the return value is a hash.
 
 For other available methods, [check here](http://www.rubydoc.info/github/lulalala/settei/master/Settei/Base).
 
@@ -83,7 +83,7 @@ BOARD_REPLY_OMIT_CONDITION_N_RECENT_ONLY=5
 BOARD_REPLY_OMIT_CONDITION_AVOID_ONLY_N_HIDDEN=2
 ```
 
-In comparison YAML allows nested hash, so we can manage them using namespaces.
+In comparison YAML allows nested hashes, so we can manage them using namespaces.
 
 ```yaml
 board:
@@ -95,7 +95,7 @@ board:
     avoid_only_n_hidden: 2
 ```
 
-Can I have the benefit of env var (12-factor) and benefit of YAML (ease of variable mangement) at the same time?
+Can I have the benefit of env var (12-factor) and the benefit of YAML (ease of variable management) at the same time?
 
 Yes, if settings are stored in YAML files, but during deploy, transfer the whole YAML **file** as one env var.
 
@@ -124,7 +124,7 @@ Maybe we can get rid of `database.yml` one day too.
 
 ## Customization
 
-The default setup is probably good enough for 90% of the users. However if you have advance requirements, you can easily customize.
+The default setup is probably good enough for 90% of the users. However if you have advanced requirements, you can easily customize.
 
 One can start by editing the generated `setting.rb` file. The three parts are `Settei::Base`, loader and deploy script:
 
