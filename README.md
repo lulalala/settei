@@ -33,7 +33,7 @@ For Rails, execute this rake task for out-of-the-box setup:
 
 This task does the following things:
 
-* create `config/setting.rb` for setting up `Setting`.
+* create `config/setting.rb` for setting up `Setting`
 * require the above in `config/application.rb`
 * create YAML files `config/environments/default.yml` and `config/environments/production.yml`
 * make git ignore YAML files above
@@ -58,7 +58,7 @@ Setting.dig(:google, :api)
 
 `#dig` is used to access its values. It's convenient because it does not err if nested hash is absent.
 
-`#dig_and_wrap` will return a `Settei::Base` if it the return value is a hash.
+`#dig_and_wrap` will return a `Settei::Base` if the return value is a hash.
 
 For other available methods, [check here](http://www.rubydoc.info/github/lulalala/settei/master/Settei/Base).
 
@@ -83,7 +83,7 @@ BOARD_REPLY_OMIT_CONDITION_N_RECENT_ONLY=5
 BOARD_REPLY_OMIT_CONDITION_AVOID_ONLY_N_HIDDEN=2
 ```
 
-In comparison YAML allows nested hash, so we can manage them using namespaces.
+In comparison YAML allows nested hashes, so we can manage them using namespaces.
 
 ```yaml
 board:
@@ -95,7 +95,7 @@ board:
     avoid_only_n_hidden: 2
 ```
 
-Can I have the benefit of env var (12-factor) and benefit of YAML (ease of variable mangement) at the same time?
+Can I have the benefit of env var (12-factor) and the benefit of YAML (ease of variable management) at the same time?
 
 Yes, if settings are stored in YAML files, but during deploy, transfer the whole YAML **file** as one env var.
 
@@ -124,7 +124,7 @@ Maybe we can get rid of `database.yml` one day too.
 
 ## Customization
 
-The default setup is probably good enough for 90% of the users. However if you have advance requirements, you can easily customize.
+The default setup is probably good enough for 90% of the users. However if you have advanced requirements, you can easily customize.
 
 One can start by editing the generated `setting.rb` file. The three parts are `Settei::Base`, loader and deploy script:
 
@@ -153,7 +153,7 @@ loader = Settei::Loaders::SimpleLoader.new(dir: 'path/to/dir')
 
 To load data, call `load(Rails.env)`. In development environment, it tries to load `development.yml` if it exists, else it loads `default.yml`.
 
-Once data is loaded, we can obtain it in hash form by calling `as_hash`
+Once data is loaded, we can obtain it in hash form by calling `as_hash`.
 
 The deploy script also relies on loader's ability to serialize the whole hash into one string, suitable for deploying as environment variable. The methods `as_env_assignment` and `as_env_value` are provided for this purpose, e.g.:
 
@@ -176,7 +176,7 @@ If you have more complex deploy requirements, just edit/revert the changes on `d
 Settei is designed to be simple so you can integrate it into any frameworks easily. The steps are mainly:
 
 1. Designate a folder for storing YAML files.
-2. Create a `setting.rb` file, in which `Settei::Base` is initialized (see `templates/setting.rb`)
+2. Create a `setting.rb` file, in which `Settei::Base` is initialized (see `templates/setting.rb`).
 3. Require it when framework starts.
 4. Load production.yml, pass its serialized form as environment variable to production (see `templates/_capistrano.rb` or `templates/_mina.rb`).
 
@@ -194,6 +194,6 @@ PRs are welcomed. Some ideas are:
 * generators for other frameworks
 * loader or its plugins
 * plugin for `Settei::Base`
-* explore deep merge hash so development.yml can combine with default.yml.
-* make loader configurable so it is easy to add and mix functionality.
+* explore deep merge hash so development.yml can combine with default.yml
+* make loader configurable so it is easy to add and mix functionality
 * rake task for heroku setup
