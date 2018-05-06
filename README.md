@@ -1,4 +1,4 @@
-# Settei
+# Settei [![Build Status](https://travis-ci.org/lulalala/settei.svg?branch=master)](https://travis-ci.org/lulalala/settei)
 
 Config as YAML file yet still being 12-factor compliant...
 
